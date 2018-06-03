@@ -14,10 +14,13 @@
 [root@linux-node1 ~]# kubectl create clusterrolebinding kubelet-bootstrap --clusterrole=system:node-bootstrapper --user=kubelet-bootstrap
 clusterrolebinding "kubelet-bootstrap" created
 ```
+（保证etcd运行正常）
 
 3.创建 kubelet bootstrapping kubeconfig 文件
 设置集群参数
 ```
+[root@linux-node1 ~]# cd /usr/local/src/ && mkdir node/kubelet -p
+[root@linux-node1 ~]# cd node/kubelet
 [root@linux-node1 ~]# kubectl config set-cluster kubernetes \
    --certificate-authority=/opt/kubernetes/ssl/ca.pem \
    --embed-certs=true \
@@ -33,6 +36,7 @@ Cluster "kubernetes" set.
    --kubeconfig=bootstrap.kubeconfig   
 User "kubelet-bootstrap" set.
 ```
+（注意：token=ad6d5bb607a186796d8861557df0d17f与api-server创建时的一致）
 
 设置上下文参数
 ```
@@ -72,12 +76,15 @@ Switched to context "default".
 
 2.创建kubelet目录
 ```
+[root@linux-node1 ~]# mkdir /var/lib/kubelet
 [root@linux-node2 ~]# mkdir /var/lib/kubelet
+[root@linux-node3 ~]# mkdir /var/lib/kubelet
 ```
 
 3.创建kubelet服务配置
 ```
-[root@k8s-node2 ~]# vim /usr/lib/systemd/system/kubelet.service
+[root@linux-node1 ~]# cd /usr/local/src/node/kubelet
+[root@k8s-node1 ~]# vim kubelet.service
 [Unit]
 Description=Kubernetes Kubelet
 Documentation=https://github.com/GoogleCloudPlatform/kubernetes
@@ -87,8 +94,8 @@ Requires=docker.service
 [Service]
 WorkingDirectory=/var/lib/kubelet
 ExecStart=/opt/kubernetes/bin/kubelet \
-  --address=192.168.56.12 \
-  --hostname-override=192.168.56.12 \
+  --address=192.168.56.11 \
+  --hostname-override=192.168.56.11 \
   --pod-infra-container-image=mirrorgooglecontainers/pause-amd64:3.0 \
   --experimental-bootstrap-kubeconfig=/opt/kubernetes/cfg/bootstrap.kubeconfig \
   --kubeconfig=/opt/kubernetes/cfg/kubelet.kubeconfig \
@@ -107,7 +114,40 @@ ExecStart=/opt/kubernetes/bin/kubelet \
   --log-dir=/opt/kubernetes/log
 Restart=on-failure
 RestartSec=5
+
+[root@linux-node1 ~]# cp kubelet.service  /usr/lib/systemd/system/kube-proxy.service
+[root@linux-node1 ~]# scp kubelet.service  192.168.56.12:/usr/lib/systemd/system/kube-proxy.service
+[root@linux-node1 ~]# scp kubelet.service  192.168.56.13:/usr/lib/systemd/system/kube-proxy.service
+
+[root@k8s-node2 ~]# vim kubelet.service
+[Unit]
+Description=Kubernetes Kubelet
+Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+After=docker.service
+Requires=docker.service
+
+[Service]
+WorkingDirectory=/var/lib/kubelet
+ExecStart=/opt/kubernetes/bin/kubelet \
+  --address=192.168.56.12 \
+  --hostname-override=192.168.56.12 \
+
+
+[root@k8s-node3 ~]# vim kubelet.service
+[Unit]
+Description=Kubernetes Kubelet
+Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+After=docker.service
+Requires=docker.service
+
+[Service]
+WorkingDirectory=/var/lib/kubelet
+ExecStart=/opt/kubernetes/bin/kubelet \
+  --address=192.168.56.13 \
+  --hostname-override=192.168.56.13 \
+  
 ```
+
 
 4.启动Kubelet
 ```
@@ -132,15 +172,23 @@ node-csr-0_w5F1FM_la_SeGiu3Y5xELRpYUjjT2icIFk9gO9KOU   1m        kubelet-bootstr
 7.批准kubelet 的 TLS 证书请求
 ```
 [root@linux-node1 ~]# kubectl get csr|grep 'Pending' | awk 'NR>0{print $1}'| xargs kubectl certificate approve
-```
+
+[root@linux-node1 system]# kubectl get csr
+NAME                                                   AGE       REQUESTOR           CONDITION
+node-csr-UfvjZTnydRhao_mkQAeYYGDkJTgz8ZJE7Oq3Khl4crs   50m       kubelet-bootstrap   Approved,Issued
+node-csr-vwLrPMd0r4-kvi0CcITLElJNbyBrHCMZRIy9CAThBsQ   50m       kubelet-bootstrap   Approved,Issued
+
 执行完毕后，查看节点状态已经是Ready的状态了
 [root@linux-node1 ssl]#  kubectl get node
 NAME            STATUS    ROLES     AGE       VERSION
+
+```
 
 ## 部署Kubernetes Proxy
 1.配置kube-proxy使用LVS
 ```
 [root@linux-node2 ~]# yum install -y ipvsadm ipset conntrack
+
 ```
 
 2.创建 kube-proxy 证书请求
@@ -182,28 +230,31 @@ NAME            STATUS    ROLES     AGE       VERSION
 
 5.创建kube-proxy配置文件
 ```
-[root@linux-node2 ~]# kubectl config set-cluster kubernetes \
+[root@linux-node1 ~]# cd /usr/local/src/ && mkdir node/kube-proxy -p
+[root@linux-node1 ~]# cd ode/kube-proxy
+[root@linux-node1 ~]# kubectl config set-cluster kubernetes \
    --certificate-authority=/opt/kubernetes/ssl/ca.pem \
    --embed-certs=true \
    --server=https://192.168.56.11:6443 \
    --kubeconfig=kube-proxy.kubeconfig
 Cluster "kubernetes" set.
 
-[root@linux-node2 ~]# kubectl config set-credentials kube-proxy \
+[root@linux-node1 ~]# kubectl config set-credentials kube-proxy \
    --client-certificate=/opt/kubernetes/ssl/kube-proxy.pem \
    --client-key=/opt/kubernetes/ssl/kube-proxy-key.pem \
    --embed-certs=true \
    --kubeconfig=kube-proxy.kubeconfig
 User "kube-proxy" set.
 
-[root@linux-node2 ~]# kubectl config set-context default \
+[root@linux-node1 ~]# kubectl config set-context default \
    --cluster=kubernetes \
    --user=kube-proxy \
    --kubeconfig=kube-proxy.kubeconfig
 Context "default" created.
 
-[root@linux-node2 ~]# kubectl config use-context default --kubeconfig=kube-proxy.kubeconfig
+[root@linux-node1 ~]# kubectl config use-context default --kubeconfig=kube-proxy.kubeconfig
 Switched to context "default".
+
 ```
 6.分发kubeconfig配置文件
 ```
@@ -214,9 +265,11 @@ Switched to context "default".
 
 7.创建kube-proxy服务配置
 ```
+[root@linux-node1 bin]# mkdir /var/lib/kube-proxy
 [root@linux-node2 bin]# mkdir /var/lib/kube-proxy
+[root@linux-node3 bin]# mkdir /var/lib/kube-proxy
 
-[root@k8s-node2 ~]# vim /usr/lib/systemd/system/kube-proxy.service
+[root@k8s-node1 ~]# vim /usr/lib/systemd/system/kube-proxy.service
 [Unit]
 Description=Kubernetes Kube-Proxy Server
 Documentation=https://github.com/GoogleCloudPlatform/kubernetes
@@ -225,8 +278,8 @@ After=network.target
 [Service]
 WorkingDirectory=/var/lib/kube-proxy
 ExecStart=/opt/kubernetes/bin/kube-proxy \
-  --bind-address=192.168.56.12 \
-  --hostname-override=192.168.56.12 \
+  --bind-address=192.168.56.11 \
+  --hostname-override=192.168.56.11 \
   --kubeconfig=/opt/kubernetes/cfg/kube-proxy.kubeconfig \
 --masquerade-all \
   --feature-gates=SupportIPVSProxyMode=true \
@@ -245,7 +298,13 @@ LimitNOFILE=65536
 
 [Install]
 WantedBy=multi-user.target
+
+[root@k8s-node1 ~]# cp kube-proxy.service /usr/lib/systemd/system/kube-proxy.service
+[root@k8s-node1 ~]# scp kube-proxy.service 192.168.56.12:/usr/lib/systemd/system/kube-proxy.service
+[root@k8s-node1 ~]# scp kube-proxy.service 192.168.56.13:/usr/lib/systemd/system/kube-proxy.service
+```
 8.启动Kubernetes Proxy
+```
 [root@linux-node2 ~]# systemctl daemon-reload
 [root@linux-node2 ~]# systemctl enable kube-proxy
 [root@linux-node2 ~]# systemctl start kube-proxy
