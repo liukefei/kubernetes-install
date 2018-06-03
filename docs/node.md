@@ -56,11 +56,12 @@ Switched to context "default".
 [root@linux-node1 kubernetes]# scp bootstrap.kubeconfig 192.168.56.13:/opt/kubernetes/cfg
 ```
 
-部署kubelet
+## 部署kubelet
+
 1.设置CNI支持
 ```
-[root@linux-node2 ~]# mkdir -p /etc/cni/net.d
-[root@linux-node2 ~]# vim /etc/cni/net.d/10-default.conf
+[root@linux-node1 ~]# mkdir -p /etc/cni/net.d
+[root@linux-node1 ~]# vim /etc/cni/net.d/10-default.conf
 {
         "name": "flannel",
         "type": "flannel",
@@ -70,7 +71,8 @@ Switched to context "default".
             "mtu": 1400
         }
 }
-
+[root@linux-node1 ~]# scp /etc/cni/net.d/10-default.conf 192.168.56.12:/etc/cni/net.d/10-default.conf
+[root@linux-node1 ~]# scp /etc/cni/net.d/10-default.conf 192.168.56.13:/etc/cni/net.d/10-default.conf
 
 ```
 
