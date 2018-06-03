@@ -20,6 +20,8 @@
 [root@linux-node1 src]# mkdir ssl && cd ssl
 [root@linux-node1 ssl]# cfssl print-defaults config > config.json
 [root@linux-node1 ssl]# cfssl print-defaults csr > csr.json
+[root@linux-node1 ssl]# vi /root/.bash_profile
+PATH=$PATH:$HOME/bin:/opt/kubernetes/bin
 ```
 
 ## 3.创建用来生成 CA 文件的 JSON 配置文件
