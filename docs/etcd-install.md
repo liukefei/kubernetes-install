@@ -11,9 +11,10 @@ wget https://github.com/coreos/etcd/releases/download/v3.2.18/etcd-v3.2.18-linux
 [root@linux-node1 etcd-v3.2.18-linux-amd64]# scp etcd etcdctl 192.168.56.13:/opt/kubernetes/bin/
 ```
 
-
 ## 1.创建 etcd 证书签名请求：
 ```
+ [root@linux-node1 ~]# cd /usr/local/src && mkdir etcd 
+ [root@linux-node1 ~]# cd etcd
  [root@linux-node1 ~]# vim etcd-csr.json
 {
   "CN": "etcd",
@@ -58,7 +59,6 @@ wget https://github.com/coreos/etcd/releases/download/v3.2.18/etcd-v3.2.18-linux
 [root@k8s-master ~]# cp etcd*.pem /opt/kubernetes/ssl
 [root@linux-node1 ~]# scp etcd*.pem 192.168.56.12:/opt/kubernetes/ssl
 [root@linux-node1 ~]# scp etcd*.pem 192.168.56.13:/opt/kubernetes/ssl
-[root@k8s-master ~]# rm -f etcd.csr etcd-csr.json
 ```
 
 ## 4.设置ETCD配置文件
@@ -123,6 +123,12 @@ WantedBy=multi-user.target
 # scp /etc/systemd/system/etcd.service 192.168.56.12:/etc/systemd/system/
 # scp /opt/kubernetes/cfg/etcd.conf 192.168.56.13:/opt/kubernetes/cfg/
 # scp /etc/systemd/system/etcd.service 192.168.56.13:/etc/systemd/system/
+
+在所有节点上etcd.conf
+[root@linux-node1 ~]# vim /opt/kubernetes/cfg/etcd.conf
+ETCD_NAME="etcd-node2"
+以及node-ip
+
 在所有节点上创建etcd存储目录并启动etcd
 [root@linux-node1 ~]# mkdir /var/lib/etcd
 [root@linux-node1 ~]# systemctl start etcd
