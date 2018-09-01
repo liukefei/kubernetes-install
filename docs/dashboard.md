@@ -10,8 +10,9 @@
 
 ```
 下载官方的dashboard YAML文件或者下载我的YAML
-
 [root@linux-node1 ~]# git clone https://github.com/gh-Devin/kubernetes-dashboard.git
+drwxr-xr-x 3 root root  159 Sep  1 18:19 kubernetes-dashboard
+-rw-r--r-- 1 root root 5131 Sep  1 18:53 kubernetes-dashboard.yaml
 
 下载dashboard镜像文件 https://github.com/datagrand/k8s_deploy/tree/master/images/dashboard
 kubernetes-dashboard-amd64.tgz
