@@ -1,3 +1,4 @@
+##安装部署
 在master节点的/etc/kubernetes/addons/下面建立文件kube-dns.yml
 
 apiVersion: v1
@@ -9,7 +10,7 @@ metadata:
     kubernetes.io/cluster-service: "true"
     addonmanager.kubernetes.io/mode: Reconcile
   namespace: kube-system
----
+
 apiVersion: v1
 kind: Service
 metadata:
@@ -30,7 +31,7 @@ spec:
   - name: dns-tcp
     port: 53
     protocol: TCP
----
+
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
@@ -175,15 +176,16 @@ spec:
             cpu: 10m
 
 
-注：clusterIP: 10.1.100.100 根据构建的环境调整地址
+##注：clusterIP: 10.1.100.100 根据构建的环境调整地址
 
+##检查
 kubectl apply -f kube-dns.yml
 
 kubectl -n kube-system get po -l k8s-app=kube-dns
 NAME                        READY     STATUS    RESTARTS   AGE
 kube-dns-7774c69f5b-xcgsm   3/3       Running   0          55m
 
-验证：
+##验证：
 kubectl create -f https://k8s.io/examples/admin/dns/busybox.yaml
 pod/busybox created
 
