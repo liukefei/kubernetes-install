@@ -242,3 +242,4 @@ linux-node4:
 - [Flannel网络部署](docs/flannel.md)
 - [创建第一个K8S应用](docs/app.md)
 - [Dashboard部署](docs/dashboard.md)
+- [DNS部署](docs/kube-dns.md)
