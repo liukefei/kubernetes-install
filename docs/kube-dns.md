@@ -1,6 +1,5 @@
 在master节点的/etc/kubernetes/addons/下面建立文件kube-dns.yml
 
-=================================================================================
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -23,7 +22,7 @@ metadata:
 spec:
   selector:
     k8s-app: kube-dns
-  clusterIP: 10.96.0.10
+  clusterIP: 10.1.100.100
   ports:
   - name: dns
     port: 53
@@ -174,7 +173,8 @@ spec:
           requests:
             memory: 20Mi
             cpu: 10m
-=========================================================================
+
+
 注：clusterIP: 10.1.100.100 根据构建的环境调整地址
 
 kubectl apply -f kube-dns.yml
@@ -182,3 +182,21 @@ kubectl apply -f kube-dns.yml
 kubectl -n kube-system get po -l k8s-app=kube-dns
 NAME                        READY     STATUS    RESTARTS   AGE
 kube-dns-7774c69f5b-xcgsm   3/3       Running   0          55m
+
+验证：
+kubectl create -f https://k8s.io/examples/admin/dns/busybox.yaml
+pod/busybox created
+
+kubectl get pods busybox
+NAME      READY     STATUS    RESTARTS   AGE
+busybox   1/1       Running   0          <some-time>
+  
+kubectl exec -ti busybox -- nslookup baidu.com
+Server:    10.1.100.100
+Address 1: 10.1.100.100 kube-dns.kube-system.svc.cluster.local
+
+Name:      baidu.com
+Address 1: 123.125.115.110
+Address 2: 220.181.57.216
+
+
