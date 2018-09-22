@@ -1,5 +1,5 @@
 ##安装部署
-在master节点的/etc/kubernetes/addons/下面建立文件kube-dns.yml
+在master节点的/home/k8-install/k8s-v1.10.1-manual/k8s-v1.10.1/kubernetes/addons/下面建立文件kube-dns.yml
 
 ```
 apiVersion: v1
