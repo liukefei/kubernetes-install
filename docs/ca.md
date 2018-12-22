@@ -7,9 +7,12 @@
 [root@linux-node1 src]# wget https://pkg.cfssl.org/R1.2/cfssljson_linux-amd64
 [root@linux-node1 src]# wget https://pkg.cfssl.org/R1.2/cfssl-certinfo_linux-amd64
 [root@linux-node1 src]# chmod +x cfssl*
-[root@linux-node1 src]# mv cfssl-certinfo_linux-amd64 /opt/kubernetes/bin/cfssl-certinfo
-[root@linux-node1 src]# mv cfssljson_linux-amd64  /opt/kubernetes/bin/cfssljson
-[root@linux-node1 src]# mv cfssl_linux-amd64  /opt/kubernetes/bin/cfssl
+[root@linux-node1 src]# cp cfssl-certinfo_linux-amd64 /opt/kubernetes/bin/
+[root@linux-node1 src]# mv cfssl-certinfo_linux-amd64 cfssl-certinfo
+[root@linux-node1 src]# cp cfssljson_linux-amd64  /opt/kubernetes/bin/
+[root@linux-node1 src]# mv cfssljson_linux-amd64 cfssljson
+[root@linux-node1 src]# cp cfssl_linux-amd64  /opt/kubernetes/bin/
+[root@linux-node1 src]# mv cfssl_linux-amd64  cfssl
 复制cfssl命令文件到k8s-node1和k8s-node2节点。如果实际中多个节点，就都需要同步复制。
 [root@linux-node1 ~]# scp /opt/kubernetes/bin/cfssl* 192.168.56.12:/opt/kubernetes/bin
 [root@linux-node1 ~]# scp /opt/kubernetes/bin/cfssl* 192.168.56.13:/opt/kubernetes/bin
