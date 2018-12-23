@@ -146,4 +146,12 @@ member 435fb0a8da627a4c is healthy: got healthy result from https://192.168.56.1
 member 6566e06d7343e1bb is healthy: got healthy result from https://192.168.56.11:2379
 member ce7b884e428b6c8c is healthy: got healthy result from https://192.168.56.13:2379
 cluster is healthy
+
+如果集群有节点无法正常不正常: request sent was ignored (cluster ID mismatch: peer[f10664d1f2a1e443]=5cbbce61e5d34dd2, local=300a2f4149de04c8)
+[root@linux-node1 ~]# rm -rf /var/lib/etcd/default.etcd/*
+[root@linux-node2 ~]# rm -rf /var/lib/etcd/default.etcd/*
+[root@linux-node3 ~]# rm -rf /var/lib/etcd/default.etcd/*
+[root@linux-node1 ~]# systemctl restart etcd
+[root@linux-node2 ~]# systemctl restart etcd
+[root@linux-node3 ~]# systemctl restart etcd
 ```
