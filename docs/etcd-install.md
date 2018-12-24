@@ -56,9 +56,9 @@ wget https://github.com/coreos/etcd/releases/download/v3.2.18/etcd-v3.2.18-linux
 
 ## 3.将证书移动到/opt/kubernetes/ssl目录下
 ```
-[root@k8s-master ~]# cp etcd*.pem /opt/kubernetes/ssl
-[root@linux-node1 ~]# scp etcd*.pem 192.168.56.12:/opt/kubernetes/ssl
-[root@linux-node1 ~]# scp etcd*.pem 192.168.56.13:/opt/kubernetes/ssl
+[root@k8s-master ~]# cp etcd*.pem /opt/kubernetes/ssl/
+[root@linux-node1 ~]# scp etcd*.pem 192.168.56.12:/opt/kubernetes/ssl/
+[root@linux-node1 ~]# scp etcd*.pem 192.168.56.13:/opt/kubernetes/ssl/
 ```
 
 ## 4.设置ETCD配置文件
@@ -71,7 +71,7 @@ ETCD_DATA_DIR="/var/lib/etcd/default.etcd"
 #ETCD_HEARTBEAT_INTERVAL="100"
 #ETCD_ELECTION_TIMEOUT="1000"
 ETCD_LISTEN_PEER_URLS="https://192.168.56.11:2380"
-ETCD_LISTEN_CLIENT_URLS="https://192.168.56.11:2379,https://127.0.0.1:2379"
+ETCD_LISTEN_CLIENT_URLS="https://192.168.56.11:2379,https://127.0.0.1:2379,http://127.0.0.1:2379"
 #ETCD_MAX_SNAPSHOTS="5"
 #ETCD_MAX_WALS="5"
 #ETCD_CORS=""
