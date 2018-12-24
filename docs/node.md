@@ -117,9 +117,9 @@ ExecStart=/opt/kubernetes/bin/kubelet \
 Restart=on-failure
 RestartSec=5
 
-[root@linux-node1 ~]# cp kubelet.service  /usr/lib/systemd/system/kube-proxy.service
-[root@linux-node1 ~]# scp kubelet.service  192.168.56.12:/usr/lib/systemd/system/kube-proxy.service
-[root@linux-node1 ~]# scp kubelet.service  192.168.56.13:/usr/lib/systemd/system/kube-proxy.service
+[root@linux-node1 ~]# cp kubelet.service  /usr/lib/systemd/system/kubelet.service
+[root@linux-node1 ~]# scp kubelet.service  192.168.56.12:/usr/lib/systemd/system/kubelet.service
+[root@linux-node1 ~]# scp kubelet.service  192.168.56.13:/usr/lib/systemd/system/kubelet.service
 
 [root@k8s-node2 ~]# vim kubelet.service
 [Unit]
