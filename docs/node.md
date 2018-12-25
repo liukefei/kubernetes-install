@@ -233,7 +233,7 @@ NAME            STATUS    ROLES     AGE       VERSION
 5.创建kube-proxy配置文件
 ```
 [root@linux-node1 ~]# cd /usr/local/src/ && mkdir node/kube-proxy -p
-[root@linux-node1 ~]# cd ode/kube-proxy
+[root@linux-node1 ~]# cd node/kube-proxy
 [root@linux-node1 ~]# kubectl config set-cluster kubernetes \
    --certificate-authority=/opt/kubernetes/ssl/ca.pem \
    --embed-certs=true \
@@ -301,7 +301,7 @@ LimitNOFILE=65536
 [Install]
 WantedBy=multi-user.target
 
-[root@k8s-node1 ~]# cp kube-proxy.service /usr/lib/systemd/system/kube-proxy.service
+[root@k8s-node1 ~]# cd /usr/lib/systemd/system/
 [root@k8s-node1 ~]# scp kube-proxy.service 192.168.56.12:/usr/lib/systemd/system/kube-proxy.service
 [root@k8s-node1 ~]# scp kube-proxy.service 192.168.56.13:/usr/lib/systemd/system/kube-proxy.service
 ```
