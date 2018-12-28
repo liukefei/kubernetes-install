@@ -40,7 +40,7 @@ kube-system   pod/kubernetes-dashboard-5cc6564db9-7c28l   1/1       Running     
 
 注意：pod无法正常启动
 如果pod出现问题需要删除dashboard创建时所需的资源，然后查看节点镜像拉取情况
-[root@linux-node1 ~]# kubectl delete -f kubectl create -f kubernetes-dashboard.yaml
+[root@linux-node1 ~]# kubectl delete -f kubernetes-dashboard.yaml
 
 注意：界面访问权限报错
 RBAC访问控制策略，可以使用kubectl或Kubernetes API进行配置。使用RBAC可以直接授权给用户，让用户拥有授权管理的权限，这样就不再需要直接触碰Master Node。
